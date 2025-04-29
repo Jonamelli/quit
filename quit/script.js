@@ -217,7 +217,7 @@ function startTimer() {
     // Reproducir la alarma cuando queden 30 segundos
     if (timeLeft <= 30) {
       // Aquí podrías agregar un sonido de alarma o advertencia, por ejemplo:
-      const warningAudio = new Audio('alerta.mp3'); // Cambia 'alerta.mp3' por la ruta de tu archivo de audio
+      const warningAudio = new Audio('./music/alerta.mp3'); // Cambia 'alerta.mp3' por la ruta de tu archivo de audio
       if (warningAudio.paused) {
         warningAudio.play();
       }
