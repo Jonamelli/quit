@@ -1,3 +1,4 @@
+
 const questions = [
   {
     question: "¿Después de irse del Racing de Santander  Guillermo Fernández Romo que equipo entrenó?",
@@ -64,12 +65,12 @@ const questions = [
 let currentQuestion = 0;
 let score = 0;
 let timer;
-let timeLeft = 90; // Ajustado a 1 minuto y medio (90 segundos)
+let timeLeft = 90;
 let lives = 5;
 let userName = "";
 let userInstagram = "";
-let skipped = []; // Lista de preguntas saltadas
-let mainQuestions = [...questions]; // Copia de las preguntas principales
+let skipped = [];
+let mainQuestions = [...questions];
 
 const startScreen = document.querySelector('.start-screen');
 const quizContainer = document.querySelector('.quiz-container');
@@ -91,6 +92,8 @@ const livesDisplay = document.createElement('p');
 livesDisplay.id = 'lives';
 document.querySelector('.quiz-container').insertBefore(livesDisplay, timerEl);
 
+let warningAudio = new Audio('./music/alerta.mp3');
+
 function shuffleQuestions() {
   questions.sort(() => Math.random() - 0.5);
 }
@@ -107,7 +110,7 @@ startBtn.addEventListener('click', () => {
   currentQuestion = 0;
   score = 0;
   lives = 5;
-  skipped = []; // Limpiamos las preguntas saltadas
+  skipped = [];
   startScreen.style.display = "none";
   quizContainer.style.display = "block";
   showQuestion();
@@ -118,7 +121,7 @@ function showQuestion() {
   questionEl.textContent = q.question;
   optionsEl.innerHTML = '';
   nextBtn.disabled = true;
-  timeLeft = 90; // Restablecemos el tiempo a 1 minuto y medio
+  timeLeft = 90;
   updateTimerDisplay();
   updateLivesDisplay();
   startTimer();
@@ -136,6 +139,8 @@ function showQuestion() {
 
 function selectOption(selected, element) {
   stopTimer();
+  stopWarningSound();
+
   const correct = mainQuestions[currentQuestion].answer;
   const options = document.querySelectorAll('.option');
   options.forEach(opt => opt.onclick = null);
@@ -169,8 +174,9 @@ nextBtn.addEventListener('click', () => {
 
 skipBtn.addEventListener('click', () => {
   stopTimer();
-  skipped.push(mainQuestions[currentQuestion]); // Añadimos la pregunta saltada a la lista
-  mainQuestions.splice(currentQuestion, 1); // Eliminamos la pregunta de la lista de preguntas activas
+  stopWarningSound();
+  skipped.push(mainQuestions[currentQuestion]);
+  mainQuestions.splice(currentQuestion, 1);
   nextQuestion();
 });
 
@@ -179,7 +185,6 @@ function nextQuestion() {
   if (currentQuestion < mainQuestions.length && lives > 0) {
     showQuestion();
   } else if (skipped.length > 0) {
-    // Al final, mostramos las preguntas saltadas
     mainQuestions = [...skipped];
     skipped.length = 0;
     currentQuestion = 0;
@@ -193,10 +198,7 @@ function endGame() {
   quizContainer.style.display = "none";
   endScreen.style.display = "block";
 
-  // Calculamos el total de preguntas como la suma de las preguntas iniciales y las saltadas
   const totalQuestions = questions.length;
-  
-  // El mensaje final debería mostrar cuántas preguntas se han acertado
   const finalText = `Has acertado ${score} de ${totalQuestions} preguntas.`;
   finalMessage.innerHTML = finalText;
 
@@ -214,24 +216,32 @@ function startTimer() {
     timeLeft--;
     updateTimerDisplay();
 
-    // Reproducir la alarma cuando queden 30 segundos
-    if (timeLeft <= 30) {
-      // Aquí podrías agregar un sonido de alarma o advertencia, por ejemplo:
-      const warningAudio = new Audio('./music/alerta.mp3'); // Cambia 'alerta.mp3' por la ruta de tu archivo de audio
+    if (timeLeft <= 30 && timeLeft > 0) {
       if (warningAudio.paused) {
-        warningAudio.play();
+        warningAudio.loop = true;
+        warningAudio.play().catch(err => console.error("No se pudo reproducir el audio:", err));
       }
+    } else {
+      stopWarningSound();
     }
 
     if (timeLeft <= 0) {
       stopTimer();
+      stopWarningSound();
       handleTimeout();
     }
-  }, 800); // Cambié el intervalo a 800 ms para que el tiempo pase más rápido
+  }, 1000);
 }
 
 function stopTimer() {
   clearInterval(timer);
+}
+
+function stopWarningSound() {
+  if (!warningAudio.paused) {
+    warningAudio.pause();
+    warningAudio.currentTime = 0;
+  }
 }
 
 function updateTimerDisplay() {
@@ -245,13 +255,20 @@ function updateLivesDisplay() {
 }
 
 function handleTimeout() {
-  stopTimer();
+  const correct = mainQuestions[currentQuestion].answer;
   const options = document.querySelectorAll('.option');
-  options.forEach(opt => opt.onclick = null);
+  options.forEach(opt => {
+    opt.onclick = null;
+    if (opt.textContent === correct) {
+      opt.style.backgroundColor = 'green';
+    }
+  });
+
   lives--;
   updateLivesDisplay();
+
   if (lives <= 0) {
-    endGame();
+    setTimeout(() => endGame(), 1000);
   } else {
     setTimeout(() => nextQuestion(), 1000);
   }
