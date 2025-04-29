@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="./style.css">
+  <title>Quiz de Fútbol</title>
+</head>
+<body>
+  <div class="start-screen active">
+    <h1>Quiz de Fútbol</h1>
+    <input type="text" id="name" placeholder="Tu nombre" />
+    <input type="text" id="instagram" placeholder="Tu Instagram (sin @)" />
+    <br />
+    <button id="start-btn">Comenzar</button>
+  </div>
+
+  <div class="quiz-container">
+    <h2 id="question"></h2>
+    <div id="options"></div>
+    <button id="next-btn" disabled>Siguiente</button>
+    <button id="skip-btn">Saltar</button>
+    <p id="score">Puntaje: 0</p>
+    <p id="timer">⏱ Tiempo restante: 3:00</p>
+  </div>
+
+  <div class="end-screen">
+    <h2>¡Juego terminado!</h2>
+    <div id="final-message"></div>
+    <a id="send-instagram" href="#" target="_blank">📩 Enviar mensaje por Instagram</a>
+    <ul id="questions-list"></ul>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>

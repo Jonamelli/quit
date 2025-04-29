@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz de Fútbol</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Pantalla de carga -->
+  <div id="loading-screen">
+    <div class="loader"></div>
+    <p>Cargando el quiz...</p>
+  </div>
+
+  <!-- Contenido del quiz (inicialmente oculto) -->
+  <div id="quiz-container" style="display: none;">
+    <!-- Aquí no mostramos contenido, ya que redirigiremos a quiz.html -->
+  </div>
+
+  <script>
+    // Simula el tiempo de carga de tu quiz
+    window.onload = function() {
+      setTimeout(() => {
+        // Oculta la pantalla de carga
+        document.getElementById('loading-screen').style.display = 'none';
+  
+        // Redirige a quiz.html después de 3 segundos
+        window.location.href = "quiz.html"; // Cambia quiz.html al archivo al que deseas redirigir
+      }, 3000); // Pantalla de carga visible por 3 segundos
+    };
+  </script>
+
+</body>
+</html>
