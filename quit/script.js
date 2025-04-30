@@ -1,4 +1,3 @@
-
 const questions = [
   {
     question: "¿Después de irse del Racing de Santander  Guillermo Fernández Romo que equipo entrenó?",
@@ -59,18 +58,34 @@ const questions = [
     question: "¿En qué año se fundó la Segunda División española, conocida como LaLiga SmartBank?",
     options: ["1830", "1870", "1929", "1930"],
     answer: "1929"
-  }
+  },
+  {
+    question: "¿Qué equipo fue subcampeón en 2017-2018?",
+    options: ["Huesca", "Alcorcón", "Albacete", "Tenerife"],
+    answer: "Huesca"
+  },
+  {
+    question: "¿Qué equipo fue subcampeón en 2013-2014?",
+    options: ["Eibar", "Sociedad", "Oviedo", "Murcia"],
+    answer: "Eibar"
+  },
+  {
+    question: "¿Qué equipo fue subcampeón de Segunda en 1992-1993?",
+    options: ["Racing de Santander", "Real Oviedo", "Zaragoza", "Real Sociedad"],
+    answer: "Racing de Santander"
+  },
 ];
+
 
 let currentQuestion = 0;
 let score = 0;
 let timer;
-let timeLeft = 90;
+let timeLeft = 90; // Ajustado a 1 minuto y medio (90 segundos)
 let lives = 5;
 let userName = "";
 let userInstagram = "";
-let skipped = [];
-let mainQuestions = [...questions];
+let skipped = []; // Lista de preguntas saltadas
+let mainQuestions = [...questions]; // Copia de las preguntas principales
 
 const startScreen = document.querySelector('.start-screen');
 const quizContainer = document.querySelector('.quiz-container');
@@ -92,8 +107,6 @@ const livesDisplay = document.createElement('p');
 livesDisplay.id = 'lives';
 document.querySelector('.quiz-container').insertBefore(livesDisplay, timerEl);
 
-let warningAudio = new Audio('./music/alerta.mp3');
-
 function shuffleQuestions() {
   questions.sort(() => Math.random() - 0.5);
 }
@@ -110,7 +123,7 @@ startBtn.addEventListener('click', () => {
   currentQuestion = 0;
   score = 0;
   lives = 5;
-  skipped = [];
+  skipped = []; // Limpiamos las preguntas saltadas
   startScreen.style.display = "none";
   quizContainer.style.display = "block";
   showQuestion();
@@ -121,7 +134,7 @@ function showQuestion() {
   questionEl.textContent = q.question;
   optionsEl.innerHTML = '';
   nextBtn.disabled = true;
-  timeLeft = 90;
+  timeLeft = 90; // Restablecemos el tiempo a 1 minuto y medio
   updateTimerDisplay();
   updateLivesDisplay();
   startTimer();
@@ -139,8 +152,6 @@ function showQuestion() {
 
 function selectOption(selected, element) {
   stopTimer();
-  stopWarningSound();
-
   const correct = mainQuestions[currentQuestion].answer;
   const options = document.querySelectorAll('.option');
   options.forEach(opt => opt.onclick = null);
@@ -174,9 +185,8 @@ nextBtn.addEventListener('click', () => {
 
 skipBtn.addEventListener('click', () => {
   stopTimer();
-  stopWarningSound();
-  skipped.push(mainQuestions[currentQuestion]);
-  mainQuestions.splice(currentQuestion, 1);
+  skipped.push(mainQuestions[currentQuestion]); // Añadimos la pregunta saltada a la lista
+  mainQuestions.splice(currentQuestion, 1); // Eliminamos la pregunta de la lista de preguntas activas
   nextQuestion();
 });
 
@@ -185,6 +195,7 @@ function nextQuestion() {
   if (currentQuestion < mainQuestions.length && lives > 0) {
     showQuestion();
   } else if (skipped.length > 0) {
+    // Al final, mostramos las preguntas saltadas
     mainQuestions = [...skipped];
     skipped.length = 0;
     currentQuestion = 0;
@@ -198,7 +209,10 @@ function endGame() {
   quizContainer.style.display = "none";
   endScreen.style.display = "block";
 
+  // Calculamos el total de preguntas como la suma de las preguntas iniciales y las saltadas
   const totalQuestions = questions.length;
+  
+  // El mensaje final debería mostrar cuántas preguntas se han acertado
   const finalText = `Has acertado ${score} de ${totalQuestions} preguntas.`;
   finalMessage.innerHTML = finalText;
 
@@ -216,32 +230,24 @@ function startTimer() {
     timeLeft--;
     updateTimerDisplay();
 
-    if (timeLeft <= 30 && timeLeft > 0) {
+    // Reproducir la alarma cuando queden 30 segundos
+    if (timeLeft <= 30) {
+      // Aquí podrías agregar un sonido de alarma o advertencia, por ejemplo:
+      const warningAudio = new Audio('./music/alerta.mp3'); // Cambia 'alerta.mp3' por la ruta de tu archivo de audio
       if (warningAudio.paused) {
-        warningAudio.loop = true;
-        warningAudio.play().catch(err => console.error("No se pudo reproducir el audio:", err));
+        warningAudio.play();
       }
-    } else {
-      stopWarningSound();
     }
 
     if (timeLeft <= 0) {
       stopTimer();
-      stopWarningSound();
       handleTimeout();
     }
-  }, 1000);
+  }, 800); // Cambié el intervalo a 800 ms para que el tiempo pase más rápido
 }
 
 function stopTimer() {
   clearInterval(timer);
-}
-
-function stopWarningSound() {
-  if (!warningAudio.paused) {
-    warningAudio.pause();
-    warningAudio.currentTime = 0;
-  }
 }
 
 function updateTimerDisplay() {
@@ -255,20 +261,13 @@ function updateLivesDisplay() {
 }
 
 function handleTimeout() {
-  const correct = mainQuestions[currentQuestion].answer;
+  stopTimer();
   const options = document.querySelectorAll('.option');
-  options.forEach(opt => {
-    opt.onclick = null;
-    if (opt.textContent === correct) {
-      opt.style.backgroundColor = 'green';
-    }
-  });
-
+  options.forEach(opt => opt.onclick = null);
   lives--;
   updateLivesDisplay();
-
   if (lives <= 0) {
-    setTimeout(() => endGame(), 1000);
+    endGame();
   } else {
     setTimeout(() => nextQuestion(), 1000);
   }
