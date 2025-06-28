@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Para Irene, con cariño!</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff6b8b, #ff8e53); /* Degradado rosa/naranja */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 400px;
+        }
+        #caja-regalo {
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        #caja-regalo:hover {
+            transform: scale(1.05);
+        }
+        .regalo-icono {
+            font-size: 70px;
+            margin-bottom: 15px;
+            color: #ff6b8b; /* Color rosa */
+        }
+        #mensaje-oculto {
+            display: none;
+            animation: fadeIn 1s;
+        }
+        h1 {
+            color: #ff6b8b;
+            margin-bottom: 20px;
+        }
+        p {
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+        .firma {
+            font-style: italic;
+            color: #888;
+            margin-top: 20px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .corazon {
+            color: red;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="caja-regalo" onclick="mostrarMensaje()">
+            <div class="regalo-icono">🎁</div>
+            <p><strong>Un regalo especial para ti, Irene...</strong></p>
+            <p>(Toca la caja)</p>
+        </div>
+        
+        <div id="mensaje-oculto">
+            <h1>¡Feliz Cumpleaños! 💖</h1>
+            <p>Irene,</p>
+            <p>Quería hacerte este pequeño detalle para recordarte lo especial que eres.</p>
+            <p>Tu sonrisa ilumina mis días, y tu amistad es un regalo que valoro más de lo que imaginas.</p>
+            <p>Que este año esté lleno de momentos increíbles, risas y sueños cumplidos.</p>
+            <p class="firma">Con todo mi cariño,<br><span class="corazon">❤️</span> [Tu nombre]</p>
+        </div>
+    </div>
+
+    <script>
+        function mostrarMensaje() {
+            document.getElementById("caja-regalo").style.display = "none";
+            document.getElementById("mensaje-oculto").style.display = "block";
+            
+            // Efecto de confeti de corazones
+            for (let i = 0; i < 50; i++) {
+                crearConfeti();
+            }
+        }
+        
+        function crearConfeti() {
+            const confeti = document.createElement("div");
+            const corazones = ["❤️", "💖", "🎉", "✨"];
+            confeti.textContent = corazones[Math.floor(Math.random() * corazones.length)];
+            confeti.style.position = "absolute";
+            confeti.style.left = Math.random() * 100 + "vw";
+            confeti.style.top = -20 + "px";
+            confeti.style.fontSize = (Math.random() * 20 + 10) + "px";
+            confeti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+            
+            document.body.appendChild(confeti);
+            
+            setTimeout(() => {
+                confeti.remove();
+            }, 5000);
+        }
+        
+        // Animación CSS para el confeti
+        const style = document.createElement("style");
+        style.innerHTML = `
+            @keyframes fall {
+                to {
+                    transform: translateY(100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
