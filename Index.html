@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Un regalo para ti, Helena...</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color-start: #2c3e50;
+            --bg-color-end: #3498db;
+            --card-bg: rgba(73, 112, 138, 0.4); 
+            --text-color: #f0f0f0;
+            --heading-font: 'Pacifico', cursive;
+            --body-font: 'Lato', sans-serif;
+            --highlight-color: #e87070;
+            --star-color: #f1c40f; 
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--bg-color-start), var(--bg-color-end));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--body-font);
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        #particles-canvas {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+        
+        .main-container {
+            position: relative; z-index: 2;
+            transition: opacity 0.5s ease-out;
+            width: 90%;
+        }
+        
+        .main-container.fade-out {
+            opacity: 0; pointer-events: none;
+        }
+
+        .intro-text h1 {
+            font-family: var(--heading-font);
+            font-size: clamp(2.5rem, 10vw, 3.5rem);
+            margin: 0;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .intro-text p {
+            font-size: clamp(1.1rem, 4vw, 1.5rem);
+            margin: 10px 0 40px 0;
+            font-weight: 300;
+        }
+
+        .boxes-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .box {
+            width: 100px; height: 100px;
+            background: linear-gradient(45deg, #8e44ad, #9b59b6);
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center; align-items: center;
+            font-size: 3rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .box:hover {
+            transform: scale(1.1) rotate(3deg);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        
+        .box.shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        #try-again-message {
+            position: fixed;
+            top: 10%; left: 50%;
+            transform: translate(-50%, -150px);
+            padding: 15px 25px;
+            background: #e74c3c;
+            color: #fff;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+            z-index: 10;
+        }
+        
+        #try-again-message.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        .result-card {
+            display: none;
+            flex-direction: column; align-items: center;
+            z-index: 3;
+            width: 90%; max-width: 450px;
+            padding: 50px 30px;
+            background: var(--card-bg);
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            opacity: 0; transform: scale(0.9);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            text-align: center;
+        }
+
+        .result-card.visible { opacity: 1; transform: scale(1); }
+        
+        .result-card h1 {
+            font-family: var(--heading-font);
+            font-size: 3.5rem;
+            margin-bottom: 35px;
+            color: #fff;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 25px rgba(255, 255, 255, 0.5);
+        }
+
+        .result-card p {
+            font-size: 1.25rem;
+            line-height: 1.7;
+            margin: 10px 0;
+            font-weight: 300;
+        }
+
+        .result-card strong {
+            color: var(--highlight-color);
+            font-weight: 400;
+        }
+
+        .stars {
+            font-size: 2.5rem;
+            margin-top: 25px;
+            display: flex; gap: 10px;
+        }
+        .stars span {
+            color: var(--star-color);
+            text-shadow: 0 0 8px var(--star-color);
+            opacity: 0; transform: scale(0.5);
+            transition: opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .stars span.visible { opacity: 1; transform: scale(1); }
+
+        @media (max-width: 600px) {
+            .box { width: 80px; height: 80px; font-size: 2.5rem; }
+            .result-card { padding: 40px 25px; }
+            .result-card h1 { font-size: 3rem; margin-bottom: 25px; }
+            .result-card p { font-size: 1.1rem; }
+            .stars { font-size: 2rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="particles-canvas"></canvas>
+    
+    <div class="main-container">
+        <div class="intro-text">
+            <h1>Para Helena</h1>
+            <p>Elige una caja para descubrir tu regalo...</p>
+        </div>
+        <div class="boxes-container">
+            <div class="box">🎁</div>
+            <div class="box">🎁</div>
+            <div class="box">🎁</div>
+            <div class="box">🎁</div>
+        </div>
+    </div>
+
+    <div id="try-again-message">Casi... ¡Inténtalo otra vez!</div>
+    
+    <div class="result-card" id="result-card">
+        <h1>Helena</h1>
+        <p>Quería decirte que el tour por <strong>El Sardinero</strong> de ayer me encantó. De verdad, fue una pasada.</p>
+        <p>Tu forma de explicarlo todo es increíble, lo haces súper ameno y transmites una pasión que contagia. ¡Qué bien lo haces!</p>
+        <p>En resumen, y para que quede claro: <strong>eres un amor</strong>. ¡Gracias por una experiencia tan genial!</p>
+        <div class="stars">
+            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Código de las partículas (sin cambios)
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            let particlesArray = []; const numberOfParticles = 120;
+            class Particle { constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 2 + 0.5; this.speedX = Math.random() * 0.4 - 0.2; this.speedY = Math.random() * 0.4 - 0.2; } update() { this.x += this.speedX; this.y += this.speedY; if (this.x > canvas.width + 5) this.x = -5; if (this.x < -5) this.x = canvas.width + 5; if (this.y > canvas.height + 5) this.y = -5; if (this.y < -5) this.y = canvas.height + 5; } draw() { ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); } }
+            function initParticles() { for (let i = 0; i < numberOfParticles; i++) { particlesArray.push(new Particle()); } }
+            function animateParticles() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); } requestAnimationFrame(animateParticles); }
+            initParticles(); animateParticles();
+            window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; particlesArray = []; initParticles(); });
+
+            // Lógica del juego
+            const boxes = document.querySelectorAll('.box');
+            const mainContainer = document.querySelector('.main-container');
+            const resultCard = document.getElementById('result-card');
+            const tryAgainMessage = document.getElementById('try-again-message');
+            const winnerIndex = Math.floor(Math.random() * boxes.length);
+            let isChecking = false;
+
+            boxes.forEach((box, index) => {
+                box.addEventListener('click', () => {
+                    if (isChecking) return;
+                    isChecking = true;
+
+                    if (index === winnerIndex) {
+                        mainContainer.classList.add('fade-out');
+                        // Esperamos a que la animación de fade-out termine
+                        setTimeout(() => {
+                            // ===== LA CORRECCIÓN CLAVE ESTÁ AQUÍ =====
+                            // Hacemos desaparecer por completo el contenedor inicial
+                            mainContainer.style.display = 'none';
+
+                            // Ahora mostramos la tarjeta, que se centrará perfectamente
+                            resultCard.style.display = 'flex';
+                            setTimeout(() => {
+                                resultCard.classList.add('visible');
+                                const stars = resultCard.querySelectorAll('.stars span');
+                                stars.forEach((star, i) => {
+                                    setTimeout(() => star.classList.add('visible'), i * 200);
+                                });
+                            }, 50);
+                        }, 500); // 500ms coincide con la duración de la transición en CSS
+                    } else {
+                        box.classList.add('shake');
+                        tryAgainMessage.classList.add('show');
+                        setTimeout(() => {
+                            box.classList.remove('shake');
+                            tryAgainMessage.classList.remove('show');
+                            isChecking = false;
+                        }, 2000);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
